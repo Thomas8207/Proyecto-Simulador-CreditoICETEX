@@ -11,11 +11,11 @@
 
 ## Descripción
 
-Aplicación en Python que calcula la cuota mensual fija que debe pagar un estudiante
-para cancelar un crédito educativo en un plazo determinado, usando el sistema de
-amortización francesa (cuota fija). Además del valor de la cuota, calcula el total
-de intereses pagados y el total pagado al finalizar el crédito.
+Aplicación en Python que calcula la cuota mensual fija que debe pagar un estudiante para cancelar un crédito educativo, usando el sistema de amortización francesa (cuota fija).
 
+A diferencia de un crédito tradicional, ICETEX no desembolsa el valor completo de la carrera al inicio: gira el valor de la matrícula semestre a semestre. Cada desembolso empieza a generar intereses desde el momento en que se entrega, y esos intereses se capitalizan durante el resto de la carrera y durante el período de gracia, hasta que el estudiante empieza a pagar cuotas. Solo en ese momento se consolida la deuda total y se calcula la cuota fija mensual.
+
+Además de la cuota, la aplicación calcula el total de intereses pagados y el total pagado al finalizar el crédito
 ---
 
 ## Arquitectura del Proyecto
@@ -87,37 +87,78 @@ OK
 
 | Entrada | Tipo | Descripción |
 |---|---|---|
-| `monto_credito_semestre` | float | Valor de matricula del semestre a financiar |
-| `tasa_interes` | float | Tasa de interés mensual en decimal (ej. `0.015` = 1.5%) |
-| `plazo` | int | Número de cuotas mensuales para pagar el crédito |
-| `periodo_gracia` | int | Tiempo de espera para comenzar a pagar. Empieza al terminar la carrera. |
+| `monto_matricula_semestre` | float | Valor de la matrícula de **un** semestre a financiar |
+| `numero_semestres` | int | Número de semestres que dura la carrera (número de desembolsos que hace ICETEX) |
+| `duracion_semestre_meses` | int | Duración de cada semestre en meses (valor típico: 6) |
+| `tasa_interes` | float | Tasa de interés mensual en decimal (ej. `0.015` = 1.5%), aplicada tanto en la fase de estudio/gracia como en la fase de pago |
+| `periodo_gracia` | int | Meses de espera adicionales para empezar a pagar, después de terminar la carrera |
+| `plazo` | int | Número de cuotas mensuales para pagar el crédito ya consolidado |
 
 ---
 
 ## Proceso
 
-El sistema calcula la cuota mensual fija usando el sistema de amortización francesa:
+### 1. Validación
+Se verifica que:
+- `monto_matricula_semestre` > 0 (si no, `MontoInvalido`)
+- `numero_semestres` > 0 (si no, `NumeroSemestresInvalido`)
+- `tasa_interes` >= 0 (si no, `TasaInvalida`)
+- `plazo` > 0 (si no, `PlazoInvalido`)
+
+Si algo falla, se lanza la excepción correspondiente con un mensaje explicando
+el error, igual que en la versión anterior.
+
+### 2. Capitalización de cada desembolso semestral
+Por cada semestre `k` (desde `1` hasta `numero_semestres`), el desembolso hecho
+en ese semestre queda expuesto a interés desde que se gira hasta que empieza el
+pago. Los meses de capitalización de ese desembolso son:
 
 ```
-Cuota = (Monto * i) / (1 - (1 + i) ** (-n))
+meses_capitalizacion_k = (numero_semestres - k) * duracion_semestre_meses + periodo_gracia
 ```
 
-Donde `Monto` es el valor del crédito, `i` es la tasa de interés mensual y `n` es el plazo en meses.
-Si la tasa es 0%, se usa: **Cuota = Monto / n**.
+Y su valor futuro al momento de empezar a pagar es:
 
-Pasos:
+```
+valor_futuro_k = monto_matricula_semestre * (1 + tasa_interes) ** meses_capitalizacion_k
+```
 
-1. **Validación:** se verifica que el monto y el plazo sean mayores que cero y que la tasa no sea negativa. Si algo falla, se lanza una excepción personalizada (`MontoInvalido`, `PlazoInvalido` o `TasaInvalida`) con un mensaje explicando el error.
-2. **Cálculo de la cuota:** se aplica la fórmula de amortización francesa.
-3. **Cálculo del total pagado:** se multiplica la cuota por el número de meses.
-4. **Cálculo de intereses:** se resta el monto del crédito al total pagado.
+(Si `tasa_interes = 0`, `valor_futuro_k = monto_matricula_semestre` para todo `k`.)
+
+### 3. Monto consolidado
+Se suman los valores futuros de todos los desembolsos:
+
+```
+monto_consolidado = Σ valor_futuro_k   (k = 1 .. numero_semestres)
+```
+
+Este es el monto sobre el que se calcula la cuota fija, **no** la suma nominal
+de las matrículas.
+
+### 4. Cálculo de la cuota (sin cambios respecto a la versión anterior)
+Se aplica la fórmula de amortización francesa sobre el monto consolidado:
+
+```
+Cuota = (monto_consolidado * i) / (1 - (1 + i) ** (-n))
+```
+
+Donde `i` es la tasa de interés mensual y `n` es `plazo`. Si `i = 0`, se usa:
+**Cuota = monto_consolidado / n**.
+
+### 5. Total pagado e intereses
+- `total_pagado = Cuota * plazo`
+- `total_matriculas = monto_matricula_semestre * numero_semestres` (suma nominal, sin intereses)
+- `total_intereses = total_pagado - total_matriculas`
+
+Así, `total_intereses` refleja tanto los intereses capitalizados durante la
+carrera/período de gracia como los intereses de la fase de pago.
 
 ---
 
 ## Salidas
 
 - **Cuota mensual:** valor fijo que el estudiante debe pagar cada mes.
-- **Total de intereses:** dinero adicional pagado por encima del monto del crédito.
+- **Total de intereses:** dinero adicional pagado por encima de la suma nominal de las matrículas.
 - **Total pagado:** suma de todas las cuotas pagadas durante el plazo.
 
 En caso de datos inválidos, el sistema muestra un mensaje de error indicando qué dato causó el problema.
