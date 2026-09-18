@@ -6,6 +6,7 @@
 
 - Juan José Camargo Chaverra
 - Juan José Cuervo Osorio
+- Thomas Leon Torres
 
 ---
 
