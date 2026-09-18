@@ -226,78 +226,72 @@ No se pudo calcular la cuota
 MontoInvalido: se recibio monto_credito=0.0, pero el monto del credito debe ser mayor que cero. Ocurrio en validar_monto_credito(), llamada desde calcular_cuota(). Solucion: ingrese un monto de credito positivo.
 ```
 
-Instrucciones para ejecutar la interfaz de Consola
-
-La interfaz de usuario se encuentra en src/view/console/consola_credito.py. Se encarga de pedir los datos al usuario, llamar a las funciones de src/model/logica_credito.py y mostrar los resultados o el error correspondiente.
-
-Cómo ejecutarla
-
-Ubíquese en la raíz del proyecto y ejecute:
-
-python src/view/console/consola_credito.py
-Menú principal (lo que se muestra al iniciar)
-
-Al ejecutar el programa, lo primero que se muestra es un mensaje de bienvenida seguido de las tres preguntas para ingresar los datos del crédito:
-
-Este programa le permite calcular la cuota a pagar por un credito educativo
-Monto del credito:
-Tasa de interes mensual del credito:
-Numero de cuotas en que va a pagar el credito:
-Proceso de cálculo
-El programa pide el monto del crédito, la tasa de interés mensual (se ingresa como número entero, ej. 1.5, y el programa la divide entre 100) y el número de cuotas.
-Con esos datos llama a calcular_cuota(), calcular_total_pagado() y calcular_total_intereses() del módulo logica_credito.
-Si algún dato es inválido, el modelo lanza una excepción (MontoInvalido, PlazoInvalido o TasaInvalida), que la consola captura y muestra como mensaje de error en vez de un resultado numérico.
-Si los datos son válidos, se muestran los tres resultados en pantalla.
-Ejemplo de ejecución
-Este programa le permite calcular la cuota a pagar por un credito educativo
-Monto del credito: 10000000
-Tasa de interes mensual del credito: 1.5
-Numero de cuotas en que va a pagar el credito: 24
-La cuota mensual a pagar es de: 499241.02
-El total pagado al final del credito es de: 11981784.47
-El total de intereses pagados es de: 1981784.47
-
-Ejemplo con un dato inválido:
-
-Este programa le permite calcular la cuota a pagar por un credito educativo
-Monto del credito: 0
-Tasa de interes mensual del credito: 1.5
-Numero de cuotas en que va a pagar el credito: 24
-No se pudo calcular la cuota
-MontoInvalido: se recibio monto_credito=0.0, pero el monto del credito debe ser mayor que cero. Ocurrio en validar_monto_credito(), llamada desde calcular_cuota(). Solucion: ingrese un monto de credito positivo.
-Instrucciones para ejecutar la interfaz Gráfica (GUI)
-
-La interfaz gráfica está en src/view/gui/creditoicetex_gui.py. Usa la librería kivy y reutiliza las mismas funciones de src/model/logica_credito.py que usa la consola, así que produce siempre los mismos resultados.
-
-Requisitos
-
+## Instrucciones para ejecutar la interfaz Gráfica (GUI)
+ 
+La interfaz gráfica está en `src/view/gui/creditoicetex_gui.py`. Usa la
+librería `kivy` y reutiliza las mismas funciones de `src/model/logica_credito.py`
+que usa la consola, así que produce siempre los mismos resultados.
+ 
+### Requisitos
+ 
 Instale kivy si no lo tiene:
-
+ 
+```
 pip install kivy
-Cómo ejecutarla
-
+```
+ 
+### Cómo ejecutarla
+ 
 Ubíquese en la raíz del proyecto y ejecute:
-
+ 
+```
 python src/view/gui/creditoicetex_gui.py
-Uso
-Ingrese el monto del crédito, la tasa de interés mensual (como número, ej. 1.5) y el número de cuotas. Cada campo muestra un texto de ejemplo (hint_text) y solo acepta caracteres numéricos.
-Dé clic en el botón Calcular.
-Si los datos son válidos, se muestran en verde la cuota mensual, el total pagado y el total de intereses, con formato de moneda (separador de miles).
-Si algún dato es inválido (monto en cero, tasa negativa, plazo menor a 1, o un campo vacío), se muestra en rojo un mensaje de error amigable, sin detalles técnicos, en vez de un resultado numérico.
-El botón Limpiar borra los tres campos y el resultado, para hacer una nueva simulación sin cerrar la aplicación.
-Funcionalidades destacadas de la GUI
-Validación en el teclado: los campos de monto y tasa solo aceptan números decimales, y el campo de cuotas solo acepta números enteros (input_filter), evitando errores de digitación antes de calcular.
-Retroalimentación visual: el resultado cambia de color según si el cálculo fue exitoso (verde) o hubo un error (rojo).
-Botón Limpiar: funcionalidad adicional para reiniciar el formulario sin reiniciar la aplicación.
-Manejo de excepciones: cada excepción del modelo (MontoInvalido, TasaInvalida, PlazoInvalido) se traduce a un mensaje de error simple y comprensible para el usuario final.
-Ejemplo de ejecución
-
+```
+ 
+### Uso
+ 
+1. Ingrese el monto del crédito, la tasa de interés mensual (como número,
+   ej. `1.5`) y el número de cuotas. Cada campo muestra un texto de ejemplo
+   (`hint_text`) y solo acepta caracteres numéricos.
+2. Dé clic en el botón **Calcular**.
+3. Si los datos son válidos, se muestran en **verde** la cuota mensual, el
+   total pagado y el total de intereses, con formato de moneda
+   (separador de miles).
+4. Si algún dato es inválido (monto en cero, tasa negativa, plazo menor a 1,
+   o un campo vacío), se muestra en **rojo** un mensaje de error amigable,
+   sin detalles técnicos, en vez de un resultado numérico.
+5. El botón **Limpiar** borra los tres campos y el resultado, para hacer
+   una nueva simulación sin cerrar la aplicación.
+### Funcionalidades destacadas de la GUI
+ 
+- **Validación en el teclado:** los campos de monto y tasa solo aceptan
+  números decimales, y el campo de cuotas solo acepta números enteros
+  (`input_filter`), evitando errores de digitación antes de calcular.
+- **Retroalimentación visual:** el resultado cambia de color según si el
+  cálculo fue exitoso (verde) o hubo un error (rojo).
+- **Botón Limpiar:** funcionalidad adicional para reiniciar el formulario
+  sin reiniciar la aplicación.
+- **Manejo de excepciones:** cada excepción del modelo (`MontoInvalido`,
+  `TasaInvalida`, `PlazoInvalido`) se traduce a un mensaje de error simple
+  y comprensible para el usuario final.
+### Ejemplo de ejecución
+ 
 Con los valores:
-
+ 
+```
 Monto del credito: 10000000
 Tasa de interes mensual del credito: 1.5
 Numero de cuotas: 24
-
+```
+ 
+Al dar clic en **Calcular**, se muestra en verde:
+ 
+```
+Cuota mensual: $ 499,241.02
+Total pagado: $ 11,981,784.47
+Total intereses: $ 1,981,784.47
+```
+ 
 Al dar clic en Calcular, se muestra en verde:
 
 Cuota mensual: $ 499,241.02
