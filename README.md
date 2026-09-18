@@ -29,8 +29,10 @@ Proyecto-Simulador-CreditoICETEX/
 │   ├── model/
 │   │   └── logica_credito.py
 │   └── view/
-│       └── console/
-│           └── consola_credito.py
+│       ├── console/
+│       │   └── consola_credito.py
+│       └── gui/
+│           └── creditoicetex_gui.py
 ├── test/
 │   └── test_credito.py
 ├── doc/
@@ -38,7 +40,7 @@ Proyecto-Simulador-CreditoICETEX/
 │   └── Entrevista parte 1 y 2 (audio)
 └── README.md
 ```
-
+ 
 ---
 
 ## Pruebas Unitarias
