@@ -7,7 +7,7 @@
 - Juan José Camargo Chaverra
 - Juan José Cuervo Osorio
 
-  ## INTEGRANTES DEL GUI
+## INTEGRANTES DEL GUI
 
 - **Thomas Leon Torres**
 - **Juan Esteban Correa Guzman**
